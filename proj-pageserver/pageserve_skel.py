@@ -69,7 +69,10 @@ def respond(sock):
 
     parts = request.split()
 
-    if len(parts) > 1 and parts[0] == "GET" and (parts[1].endswith(".html") or parts[1].endswith(".css")):
+    if ("~" in parts[1] or "//" in parts[1]):
+        transmit("\nI don't handle this request: {}\n".format(request), sock)
+
+    elif len(parts) > 1 and parts[0] == "GET" and (parts[1].endswith(".html") or parts[1].endswith(".css")):
         path = parts[1].lstrip("/") # strips to "file.postfix"
         try:
             openFile = open(path)
@@ -79,6 +82,7 @@ def respond(sock):
         except FileNotFoundError:
             transmit("HTTP/1.0 200 OK\n\n", sock)
             transmit("This page doesn't exist. Have a 404!", sock)
+            
     elif len(parts) > 1 and parts[0] == "GET":
         transmit("HTTP/1.0 200 OK\n\n", sock)
         transmit(CAT, sock)
