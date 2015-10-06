@@ -64,6 +64,7 @@ def page_not_found(error):
 #
 #################
 
+# Unused. I couldn't think of a good reason to use this since Arrow objects can't be shipped as JSON.
 @app.template_filter( 'fmtdate' )
 def format_arrow_date( date ):
     try: 

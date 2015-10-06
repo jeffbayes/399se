@@ -31,7 +31,7 @@ def process(raw):
 
         if field == "begin":
             try:
-                base = arrow.get(content)
+                base = arrow.get(content, "MM/DD/YYYY")
             except:
                 raise ValueError("Unable to parse date {}".format(content))
 
@@ -42,6 +42,17 @@ def process(raw):
             entry['topic'] = ""
             entry['project'] = ""
             entry['week'] = content
+
+            weekNumber = int(content)
+            arrowDate = base.replace(weeks =+ (weekNumber - 1)) ## Week starts at 1, but we want to start at 0.
+            entry['date'] = arrowDate.format("ddd MM/DD/YYYY")
+
+            now = arrow.utcnow()
+            nowWeek = now.floor('week')
+            if nowWeek == arrowDate:
+                entry['thisWeek'] = True 
+            else:
+                entry['thisWeek'] = False
 
         elif field == 'topic' or field == 'project':
             entry[field] = content

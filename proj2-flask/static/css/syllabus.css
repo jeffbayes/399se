@@ -30,6 +30,11 @@ tr.even {
     background-color: rgb(224,213,179);
 }
 
+tr.thisWeek {
+    /* Neon yellow. */
+    background-color: rgb(204, 255, 21);
+}
+
 .class-schedule .week {
     
     font-weight: bolder;
@@ -49,4 +54,9 @@ tr.even {
     border-left-color: black; 
     padding-left: 2ex;
     font-style: italic;
+}
+
+.date {
+    font-weight: normal;
+    font-size: 75%;
 }
