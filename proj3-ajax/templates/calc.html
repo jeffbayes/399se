@@ -1,0 +1,203 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>ACP Controle Times</title>
+
+  <!-- 'viewport' is used by bootstrap to respond to device size -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Javascript:  JQuery from a content distribution network (CDN) -->
+  <script
+     src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+  </script>
+
+  <!-- Bootstrap includes javascript and css  (must follow jquery) -->
+  <link rel="stylesheet"
+   href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+   <script
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">
+   </script>
+
+  <script type="text/javascript" 
+     src="/static/js/new_row.js">
+  </script>
+</head>
+
+   <!-- Our own style sheet -->
+   <link rel="stylesheet" href="/static/css/calc.css" />
+
+<body>
+<!-- bootstrap requires a 'container' div around content -->
+<div class="container">
+
+<h1 class="text-center">ACP Brevet Calculator</h1>
+<br>
+
+  <!--
+  -- If there are any warnings or other messages from a prior
+  -- request to the server, 
+  -- they appear above the rest of the content, just until the next 
+  -- action.  (This is only on request/response transactions that
+  -- result in regenerating the page, not on every xmlhttp request.) 
+  -->
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<!-- Design on bootstrap grid -->
+
+<div class="row">
+  <div class="col-md-12">
+    <strong>Brevet Distance:&nbsp;</strong>
+    <select id="brevet-distance">
+      <option value="200">200</option>
+      <option value="300">300</option>
+      <option value="400">400</option>
+      <option value="600">600</option>
+      <option value="1000">1000</option>
+    </select>
+    &nbsp;km&nbsp;&nbsp;|&nbsp;&nbsp;
+    <strong>Input units:&nbsp;</strong>
+    <select id="input-units">
+      <option value="kilometers">kilometers</option>
+      <option value="miles">distance</option>
+    </select>
+  </div>
+  <div class="col-md-12">
+    <strong>Starting Date</strong>
+    (YYYY/MM/DD):&nbsp;
+    <input type="text" id="start-date" defaultValue="2015/01/01" />
+  </div>
+  <div class="col-md-12">
+    <strong>Starting Time</strong>
+    (HH:MM, 24-hour format):&nbsp;
+    <input type="text" id="start-time" defaultValue="16:30" />
+  </div>
+</div>
+<hr>
+
+<div class="row">
+  <div class="col-md-2">
+    <strong>Distance</strong>
+  </div>
+  <div class="col-md-4">
+    <strong>Location (optional)</strong>
+  </div>
+  <div class="col-md-6">
+    <strong>Open to Close Times</strong>
+  </div>
+</div>
+<br>
+
+<form role="form" class="brevet-calc">
+<div class="row">
+  <div class="col-md-2">
+    <input type="text" class="form-control"
+     name="distance" placeholder="Distance"/>
+  </div>
+  <div class="col-md-4">
+    <input type="text" class="form-control"
+      name="location" placeholder="location" />
+  </div>
+  <div class="col-md-6">
+    <span class="times form-control">...</span>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-2">
+    <input type="text" class="form-control"
+     name="distance" placeholder="Distance"/>
+  </div>
+  <div class="col-md-4">
+    <input type="text" class="form-control"
+      name="location" placeholder="location" />
+  </div>
+  <div class="col-md-6">
+    <span class="times form-control">...</span>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-2">
+    <input type="text" class="form-control"
+     name="distance" placeholder="Distance"/>
+  </div>
+  <div class="col-md-4">
+    <input type="text" class="form-control"
+      name="location" placeholder="location" />
+  </div>
+  <div class="col-md-6">
+    <span class="times form-control">...</span>
+  </div>
+</div>
+</form>
+
+<button onClick="addRow()">
+  New Row at Bottom
+</button>
+
+<button onClick="removeRow()">
+  Remove Last Row
+</button>
+
+<button onClick="updateAll()">
+  Update All Times
+</button>
+
+<script type="text/javascript">
+
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+
+  var changeFunction = function(self){
+      // ... execute this function
+      
+      var startDate = $("#start-date").val();
+      var startTime = $("#start-time").val();
+      var units = $("#input-units option:selected").val();
+      var brevetDistance = $("#brevet-distance option:selected").val();
+
+      var distance = self.val();
+
+      var target = self.parents(".row").find(".times");
+
+      // DEBUG: How do I replace the 'times' field?
+      // alert("Content of the field I want to change: " +
+      //   target.html());
+
+      // AJAX request
+      $.getJSON($SCRIPT_ROOT + '/_calc_times',
+          // The object to pass to the server
+          { 
+            units: units,
+            distance: distance, 
+            start_time: startTime, 
+            start_date: startDate, 
+            brevet_distance: brevetDistance 
+          },
+          // The function to call with the response
+          function(data) {
+             var times = data.result;
+             // alert("Got a response: " +  times);
+             target.text(times);
+          }); // End of the call to getJSON
+      }
+
+
+
+  $('input[name="distance"]').on("change", function(){
+      changeFunction( $(this) );
+  });
+              
+
+</script>
+
+</div>
+</body> </html>

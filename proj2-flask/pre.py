@@ -50,7 +50,7 @@ def process(raw):
             now = arrow.utcnow()
             nowWeek = now.floor('week')
             if nowWeek == arrowDate:
-                entry['thisWeek'] = True 
+                entry['thisWeek'] = True
             else:
                 entry['thisWeek'] = False
 
