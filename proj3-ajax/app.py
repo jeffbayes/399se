@@ -49,7 +49,7 @@ def index():
 @app.errorhandler(404)
 def page_not_found(error):
     app.logger.debug("Page not found")
-    flask.session['linkback'] =  flask.url_for("index")
+    flask.session['linkback'] = flask.url_for("index")
     return flask.render_template('page_not_found.html'), 404
 
 
@@ -177,6 +177,10 @@ if __name__ == "__main__":
     app.secret_key = str(uuid.uuid4())
     app.debug=CONFIG.DEBUG
     app.logger.setLevel(logging.DEBUG)
-    app.run(port=CONFIG.PORT)
+    if CONFIG.DEBUG:
+        # Reachable only from the same computer
+        app.run(port=CONFIG.PORT)
 
-    
+    else:
+        # Reachable from anywhere 
+        app.run(port=CONFIG.PORT,host="0.0.0.0")
