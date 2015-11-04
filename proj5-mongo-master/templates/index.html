@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Memos</title>
+
+  <!-- 'viewport' is used by bootstrap to respond to device size -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Javascript:  JQuery from a content distribution network (CDN) -->
+  <script
+     src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+  </script>
+
+  <!-- Bootstrap includes javascript and css  (must follow jquery) -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <script 
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">
+  </script>
+
+  <!-- Our own style sheet -->
+  <link rel="stylesheet" href="/static/css/memos.css" />
+
+
+
+</head>
+<body>
+<div class="container">
+
+<!-- Flashed messages before content -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<h1>Memos</h1>
+
+{% if session.memos %}
+    {% for memo in session.memos %}
+  <div class="memo">
+    <div class="row">
+      <div class="col-md-1">
+        <a name="destroy">Delete</a>
+      </div>
+      <div id="memo-date" class="col-md-2">{{ memo.date | humanize }}</div>
+      <div id="memo-date-raw" style="display: none;">{{ memo.date }}</div>
+      <div id="memo-text" class="col-md-9">{{ memo.text }}</div>
+    </div> <!-- row -->
+  </div> <!-- memo -->
+  {% endfor %}
+{% else %}
+  <p>No memos for you. </p>  
+{% endif %}
+
+<br>
+<a href="/create">New Memo</a>
+
+ 
+  <script>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    
+    var deleteMemo = function(memo, date) {
+      var url = $SCRIPT_ROOT + '/_destroy';
+      $.getJSON(url, {"memo": memo, "date": date}, function(data) {
+          $(location).attr('href', $SCRIPT_ROOT);
+        }
+      ).fail(function(e) {
+        console.log("ERROR", e);
+      });
+      
+    }
+
+    $('a[name="destroy"]').on("click", function(){
+      var self = $(this);
+      var memoObject = self.parents(".row").find("#memo-text");
+      var memo = memoObject.text();
+      var dateObject = self.parents(".row").find("#memo-date-raw");
+      var date = dateObject.text();
+      deleteMemo(memo, date);
+    });
+
+
+  </script>
+
+</div> <!-- container -->
+</body>
+</html>
