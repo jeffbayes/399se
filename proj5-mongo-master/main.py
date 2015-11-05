@@ -23,6 +23,7 @@ from flask import jsonify # For AJAX transactions
 
 import json
 import logging
+import uuid
 
 # Date handling 
 import arrow # Replacement for datetime, based on moment.js
@@ -90,9 +91,13 @@ def destroy_memo():
   app.logger.debug("Got a JSON request: DESTROY")
   date = request.args.get('date', "2015/01/01", type=str)
   memo = request.args.get('memo', "This was a blank memo...", type=str)
-  date = arrow.get(date, "YYYY-MM-DD").to('utc').naive
+  try:
+    date = arrow.get(date, "YYYY-MM-DD").to('utc').naive
+  except:
+    date = date
   app.logger.debug(memo, date)
-  db.dated.delete_one({"text": memo, "date": date})
+  print(memo, " and ", date)
+  collection.delete_one({"text": memo, "date": date})
   return jsonify(result = "Success!... maybe?")
 
 
@@ -177,9 +182,11 @@ def put_memo(dt, mem):
        mem: Text of memo
     NOT TESTED YET
     """
+    uniqueId = uuid.uuid4()
     record = { "type": "dated_memo", 
                "date": dt.to('utc').naive,
-               "text": mem
+               "text": mem,
+               "uuid": str(uniqueId)
             }
     collection.insert(record)
     return 
