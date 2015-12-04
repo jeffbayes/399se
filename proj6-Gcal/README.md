@@ -1,3 +1,6 @@
+This application (and part II and III) can be found [here](ix.cs.uoregon.edu:7743) upon request.
+The app.cgi script does not work, so I have to start the process manually.
+
 # proj6-Gcal
 Snarf appointment data from a selection of a user's Google calendars 
 
