@@ -12,6 +12,7 @@ from dateutil import tz  # For interpreting local times
 # Modularized Python code
 from meetingmaker import app
 import meetingmaker.helpers as helpers
+import meetingmaker.part2 as part2
 from meetingmaker.oauth import *
 from meetingmaker.template_filters import *
 
@@ -48,10 +49,8 @@ def choose():
 
 @app.route("/busy_times")
 def busy_times():
-  """Shows basic usage of the Google Calendar API.
-
-  Creates a Google Calendar API service object and outputs a list of the next
-  10 events on the user's calendar.
+  """
+  Returns an array of events, indicating when the user is busy.
   """
   app.logger.debug("Checking credentials for Google calendar access...")
   credentials = valid_credentials()
@@ -104,7 +103,7 @@ def setrange():
     return flask.redirect(flask.url_for("choose"))
 
 @app.route("/_list_events", methods=['POST'])
-def list_events():
+def _list_events():
   """
   !!! TODO: CREATE A DOCSTRING !!!
   """
@@ -118,5 +117,24 @@ def list_events():
   app.logger.debug("Returned from get_gcal_service.")
 
   flask.session['busy_times'] = helpers.busy_times(gcal_service, request.form)
+
+  return flask.redirect(flask.url_for("index"))
+
+@app.route("/_meeting_times", methods=['POST'])
+def meeting_times():
+  """
+  !!! TODO: CREATE A DOCSTRING !!!
+  """
+  app.logger.debug("Checking credentials for Google calendar access...")
+  credentials = valid_credentials()
+  if not credentials:
+    app.logger.debug("Redirecting to authorization...")
+    return flask.redirect(flask.url_for('oauth2callback'))
+
+  gcal_service = get_gcal_service(credentials)
+  app.logger.debug("Returned from get_gcal_service.")
+
+  ## TODO: Update to windows
+  flask.session['windows'] = part2.windows(gcal_service, request.form)
 
   return flask.redirect(flask.url_for("index"))

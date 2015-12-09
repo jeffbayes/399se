@@ -107,6 +107,23 @@
 <br>
 
 
+    {% if session.windows is defined %}
+      <div class="row">
+        <div class="col-md-12">
+          <p>According to your Google calendar, you're busy during these times:</p>
+        </div>
+      {% for event in session.windows %}
+        <div class="col-md-4">
+          {{ event[0] | humandatetime }} &mdash; {{ event[1] | fmttime }}
+        </div>
+      {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if session.busy_times is defined and session.windows is defined or session.calendars is defined %}
+      <br><hr><br>
+    {% endif %}
+
 
 
     {% if session.busy_times is defined %}
@@ -117,7 +134,7 @@
       {% for event in session.busy_times %}
         <div class="col-md-4">
           <h4>{{ event.event_name }}</h4>
-          <p>{{ event.event_start }} &mdash; {{ event.event_end }}</p>
+          <p>{{ event.event_start | fmtdatetime }} &mdash; {{ event.event_end | fmtdatetime }}</p>
         </div>
       {% endfor %}
       </div>
@@ -135,7 +152,7 @@
     -->
     {% if session.calendars is defined  %}
 
-      <form action="/_list_events" method="post">
+      <form action="/_meeting_times" method="post">
         <div class="row">
         {% for cal in session.calendars if cal.selected %}
           <div class="col-md-4">

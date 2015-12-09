@@ -16,7 +16,7 @@ from dateutil import tz  # For interpreting local times
 def format_arrow_date( date ):
     try: 
         normal = arrow.get( date )
-        return normal.format("ddd MM/DD/YYYY")
+        return normal.format("ddd YYYY-MM-DD")
     except:
         return "(bad date)"
 
@@ -27,3 +27,19 @@ def format_arrow_time( time ):
         return normal.format("HH:mm")
     except:
         return "(bad time)"
+
+@app.template_filter( 'fmtdatetime' )
+def format_arrow_datetime( datetime ):
+    try: 
+        normal = arrow.get( datetime )
+        return normal.format("YYYY-MM-DD HH:mm")
+    except:
+        return "(bad datetime)"
+
+@app.template_filter( 'humandatetime' )
+def human_datetime( datetime ):
+    try: 
+        normal = arrow.get( datetime )
+        return normal.format("ddd MMM D HH:mm")
+    except:
+        return "(bad datetime)"

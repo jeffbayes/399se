@@ -119,7 +119,108 @@ def list_calendars(service):
     return sorted(result, key=cal_sort_key)
 
 
+# def extract_events_gcal(processed_events, service, calendar, begin, end):
+
+#   response = service.events().list(
+#     calendarId = calendar,
+#     timeMin = begin.datetime.isoformat(), 
+#     timeMax = end.datetime.isoformat(),
+#     singleEvents = True
+#     ).execute()
+#   raw_events = response.get('items', [])
+#   for event in raw_events:
+#     if "transparency" in event:
+#       ## We don't want to list transparent events.
+#       continue
+
+#     event_name = event['summary']
+#     event_start = arrow.get(event['start']['dateTime'])
+#     event_end = arrow.get(event['end']['dateTime'])
+#     event_details = {
+#       "event_name": event_name,
+#       "event_start": event_start.format("YYYY-MM-DD HH:mm"),
+#       "event_end": event_end.format("YYYY-MM-DD HH:mm")
+#     }
+#     processed_events.append(event_details)
+
+#   return processed_events
+
+
+# def busy_times(service, form):
+#   busy_times = [ ]
+#   not_a_calendar = ["begin_date", "end_date", "begin_time", "end_time"]
+
+#   begin_date = arrow.get(form.get('begin_date'))
+#   end_date = arrow.get(form.get('end_date'))
+#   begin_time = arrow.get(form.get('begin_time'))
+#   end_time = arrow.get(form.get('end_time'))
+
+#   begin = replace_time(begin_date, begin_time)
+#   end = replace_time(end_date, end_time)
+
+#   for calendar in form:
+#     if calendar in not_a_calendar:
+#       ## Current mechanic totally sucks, so we have to just exclude these by hand.
+#       continue
+#     events_result = service.events().list(
+#       calendarId = calendar,
+#       timeMin = begin.datetime.isoformat(), 
+#       timeMax = end.datetime.isoformat(),
+#       singleEvents = True
+#       ).execute()
+
+#     events_list = events_result.get('items', [])
+#     app.logger.debug(events_list)
+#     for event in events_list:
+#       if "transparency" in event:
+#         ## We don't want to list transparent events.
+#         continue
+
+#       event_name = event['summary']
+#       event_start = arrow.get(event['start']['dateTime'])
+#       event_end = arrow.get(event['end']['dateTime'])
+#       valid_event = event_validator(begin, end, event_start, event_end)
+#       if valid_event:
+#         event_details = {
+#           "event_name": event_name,
+#           "event_start": event_start.format("YYYY-MM-DD HH:mm"),
+#           "event_end": event_end.format("YYYY-MM-DD HH:mm")
+#         }
+#         busy_times.append(event_details)
+
+#     busy_times.append = extract_events_gcal(service, calendar, begin, end)
+
+#   return busy_times
+
+
+def extract_events_gcal(processed_events, service, calendar, begin, end):
+  response = service.events().list(
+    calendarId = calendar,
+    timeMin = begin.datetime.isoformat(), 
+    timeMax = end.datetime.isoformat(),
+    singleEvents = True
+    ).execute()
+  raw_events = response.get('items', [])
+  for event in raw_events:
+    if "transparency" in event:
+      ## We don't want to list transparent events.
+      continue
+
+    event_name = event['summary']
+    event_start = arrow.get(event['start']['dateTime'])
+    event_end = arrow.get(event['end']['dateTime'])
+    event_details = {
+      "event_name": event_name,
+      "event_start": event_start.isoformat(),
+      "event_end": event_end.isoformat()
+    }
+    processed_events.append(event_details)
+
+  return processed_events
+
+
 def busy_times(service, form):
+  app.logger.debug("Entered busy_times...")
   busy_times = [ ]
   not_a_calendar = ["begin_date", "end_date", "begin_time", "end_time"]
 
@@ -135,31 +236,11 @@ def busy_times(service, form):
     if calendar in not_a_calendar:
       ## Current mechanic totally sucks, so we have to just exclude these by hand.
       continue
-    events_result = service.events().list(
-      calendarId = calendar,
-      timeMin = begin.datetime.isoformat(), 
-      timeMax = end.datetime.isoformat(),
-      singleEvents = True
-      ).execute()
+    app.logger.debug("Entered calendar in busy_times...")
+    app.logger.debug(calendar)
 
-    events_list = events_result.get('items', [])
-    app.logger.debug(events_list)
-    for event in events_list:
-      if "transparency" in event:
-        ## We don't want to list transparent events.
-        continue
-
-      event_name = event['summary']
-      event_start = arrow.get(event['start']['dateTime'])
-      event_end = arrow.get(event['end']['dateTime'])
-      valid_event = event_validator(begin, end, event_start, event_end)
-      if valid_event:
-        event_details = {
-          "event_name": event_name,
-          "event_start": event_start.format("YYYY-MM-DD HH:mm"),
-          "event_end": event_end.format("YYYY-MM-DD HH:mm")
-        }
-        busy_times.append(event_details)
+    ## Uses side-effects, appends new events to busy_times.
+    extract_events_gcal(busy_times, service, calendar, begin, end)
 
   return busy_times
 
