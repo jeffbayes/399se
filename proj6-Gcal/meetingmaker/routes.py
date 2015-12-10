@@ -47,24 +47,6 @@ def choose():
     flask.session['calendars'] = helpers.list_calendars(gcal_service)
     return render_template('index.html')
 
-@app.route("/busy_times")
-def busy_times():
-  """
-  Returns an array of events, indicating when the user is busy.
-  """
-  app.logger.debug("Checking credentials for Google calendar access...")
-  credentials = valid_credentials()
-  if not credentials:
-    app.logger.debug("Redirecting to authorization...")
-    return flask.redirect(flask.url_for('oauth2callback'))
-
-  gcal_service = get_gcal_service(credentials)
-  app.logger.debug("Returned from get_gcal_service.")
-
-  flask.session['busy_times'] = helpers.busy_times(gcal_service, request.form)
-
-  return render_template('index.html')
-
 #####
 #
 #  Option setting:  Buttons or forms that add some
@@ -105,7 +87,7 @@ def setrange():
 @app.route("/_list_events", methods=['POST'])
 def _list_events():
   """
-  !!! TODO: CREATE A DOCSTRING !!!
+  Stashes a session documenting all events in a given date range.
   """
   app.logger.debug("Checking credentials for Google calendar access...")
   credentials = valid_credentials()
@@ -123,7 +105,7 @@ def _list_events():
 @app.route("/_meeting_times", methods=['POST'])
 def meeting_times():
   """
-  !!! TODO: CREATE A DOCSTRING !!!
+  Stashes a session documenting all free times in a given date and time range, based on your Google Calendar.
   """
   app.logger.debug("Checking credentials for Google calendar access...")
   credentials = valid_credentials()
