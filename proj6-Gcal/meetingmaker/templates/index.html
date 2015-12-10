@@ -110,7 +110,7 @@
     {% if session.windows is defined %}
       <div class="row">
         <div class="col-md-12">
-          <p>According to your Google calendar, you're busy during these times:</p>
+          <p>According to your Google calendar, you should plan your meeting during these times:</p>
         </div>
       {% for event in session.windows %}
         <div class="col-md-4">
@@ -174,7 +174,7 @@
           <input type="text" name="end_time" value="{{ session.end_time }}" />
         </div>
         <br>
-        <input type="submit" value="Find Busy Times" />
+        <input type="submit" value="Find Meeting Times" />
       </form>
     {% endif %}
 

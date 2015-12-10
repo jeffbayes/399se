@@ -100,11 +100,13 @@ def init_time_windows(start_date, end_date):
   if days_in_range <= 0:
     # Handles error -- bypasses the for loop and returns empty set.
     days_in_range = 0
+  end_hour = end_date.hour
+  end_minute = end_date.minute
 
   for i in range(days_in_range):
-    window_date = start_date.replace(days = +i)
-    window_start = window_date.replace(hour = 9, minute = 0)
-    window_end = window_date.replace(hour = 17, minute = 0)
+    ## window_date always inherits the correct start time. Hooray!
+    window_start = start_date.replace(days = +i) 
+    window_end = window_start.replace(hour = end_hour, minute = end_minute)
     ## Make a date-range tuple.
     window = (window_start.isoformat(), window_end.isoformat())
     key = str(uuid.uuid4())
