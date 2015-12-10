@@ -8,6 +8,15 @@ now = arrow.now()
 window_start = now.replace(hour=9, minute=0)
 window_end = now.replace(hour=17, minute=0)
 
+"""
+Test choosing:
+Each of the 10 tests check a different case in how an event could
+potentially interfere with a meeting window. It also handles date
+transitions from day to day to ensure that the passing of a day
+doesn't throw it off. Each case is described in the short comment
+inside each test.
+"""
+
 def test1():
   ## Cut front chunk from existing window
   expected_begin = now.replace(hour=10, minute=0)
