@@ -1,5 +1,6 @@
 # Local
 google_client_secret.json
+google_client_secret_prod.json
 CONFIG.py
 .goog_app_key.json
 *~
